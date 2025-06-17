@@ -199,7 +199,7 @@ def download_docx():
     heading_cell = heading_row.cells[0].merge(heading_row.cells[1])
     heading_paragraph = heading_cell.paragraphs[0]
     heading_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = heading_paragraph.add_run("Samsung Electronics Co., Ltd. – Massive MIMO Radios")
+    run = heading_paragraph.add_run("Company Name – Product Name")
     run.bold = True
 
     # Fill left column only
