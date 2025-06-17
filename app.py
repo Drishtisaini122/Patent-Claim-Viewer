@@ -13,6 +13,7 @@ app = Flask(__name__)
 
 load_dotenv()  # load variables from .env
 API_KEY = os.getenv("API_KEY")
+print("API_KEY from env:", API_KEY)
 
 def set_landscape(section):
     section.orientation = 1  # landscape
