@@ -8,6 +8,11 @@ from docx.enum.table import WD_ROW_HEIGHT_RULE
 import re
 from dotenv import load_dotenv
 import os
+from docx.shared import Inches, Pt
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 app = Flask(__name__)
 
@@ -182,6 +187,44 @@ def download_docx():
     run6 = p6.add_run("Source:")
     run6.font.size = Pt(11)
     run6.bold = True
+
+    doc.add_page_break()
+
+    # Create table with 6 rows and 2 columns
+    table = doc.add_table(rows=6, cols=2)
+    table.style = 'Table Grid'
+
+    # Merge top row for title
+    heading_row = table.rows[0]
+    heading_cell = heading_row.cells[0].merge(heading_row.cells[1])
+    heading_paragraph = heading_cell.paragraphs[0]
+    heading_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    run = heading_paragraph.add_run("Samsung Electronics Co., Ltd. – Massive MIMO Radios")
+    run.bold = True
+
+    # Fill left column only
+    table.cell(1, 0).text = "Key claim(s)"
+    table.cell(2, 0).text = "Product/Service commercially available in patent territory"
+    table.cell(3, 0).text = "Company Value"
+    table.cell(4, 0).text = "Company Address in Patent’s Territory"
+    table.cell(5, 0).text = "Product/Service Sales data"
+
+    # Add height and vertical alignment to all rows
+    desired_height = Inches(0.4)  # or use Pt(30) for ~30 points
+
+    for row in table.rows:
+        tr = row._tr
+        trPr = tr.get_or_add_trPr()
+        trHeight = OxmlElement('w:trHeight')
+        trHeight.set(qn('w:val'), str(int(desired_height.inches * 1440)))  # Word uses 1/20 pt units
+        trHeight.set(qn('w:hRule'), 'exact')  # Use 'atLeast' if you want minimum instead of fixed
+        trPr.append(trHeight)
+        for cell in row.cells:
+            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+    doc.add_paragraph()  # Add spacing after table if needed
+
+
 
 
     doc.add_page_break()
