@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patent Claim Viewer</title>
+    <style>
+        body { font-family: Arial; margin: 40px; background-color: #f4f4f4; }
+        .container { background: white; padding: 30px; border-radius: 8px; max-width: 800px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input[type=text] { width: 80%; padding: 8px; }
+        input[type=submit], button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .claim { margin-bottom: 10px; padding: 10px; background-color: #eef; border-radius: 5px; }
+        h1, h2 { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Patent Claim Viewer</h1>
+        <form method="POST">
+            <input type="text" name="patent_number" placeholder="Enter patent number" required />
+            <input type="submit" value="Search Patent" />
+        </form>
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+
+        {% if patent %}
+            <h2>Patent Information</h2>
+            <p><strong>Publication Number:</strong> {{ patent.publication_number }}</p>
+            <p><strong>Title:</strong> {{ patent.title }}</p>
+            <p><strong>Grant Date:</strong> {{ patent.grant_date }}</p>
+            <p><strong>Assignee:</strong> {{ patent.assignee }}</p>
+            <p><strong>Priority Date:</strong> {{ patent.priority_date }}</p>
+            <p><strong>Filing Date:</strong> {{ patent.filing_date }}</p>
+            <p><strong>Inventors:</strong> {{ patent.inventors }}</p>
+            <p><strong>Abstract:</strong> {{ patent.abstract }}</p>
+            <p><strong>Number of Claims:</strong> {{ patent.claims|length }}</p>
+            <p><strong>Patent Link:</strong> <a href="{{ patent.link }}" target="_blank">{{ patent.link }}</a></p>
+
+            <h2>Claims</h2>
+            {% for claim in patent.claims %}
+                <div class="claim">{{ claim }}</div>
+            {% endfor %}
+
+            <form action="/download_docx" method="POST">
+                {% for claim in patent.claims %}
+                    <input type="hidden" name="claims[]" value="{{ claim }}">
+                {% endfor %}
+                <input type="hidden" name="publication_number" value="{{ patent.publication_number }}">
+                <input type="hidden" name="title" value="{{ patent.title }}">
+                <input type="hidden" name="grant_date" value="{{ patent.grant_date }}">
+                <input type="hidden" name="assignee" value="{{ patent.assignee }}">
+                <input type="hidden" name="priority_date" value="{{ patent.priority_date }}">
+                <input type="hidden" name="filing_date" value="{{ patent.filing_date }}">
+                <input type="hidden" name="inventors" value="{{ patent.inventors }}">
+                <input type="hidden" name="abstract" value="{{ patent.abstract }}">
+                <input type="hidden" name="num_claims" value="{{ patent.claims|length }}">
+                <input type="hidden" name="patent_link" value="{{ patent.link }}">
+                <button type="submit">Download Claims as Word Table</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
