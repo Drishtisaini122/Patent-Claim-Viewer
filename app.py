@@ -155,12 +155,6 @@ def download_docx():
     run1.font.size = Pt(11)
     p1.alignment = 1  # center
 
-    p2 = doc.add_paragraph()
-    run2 = p2.add_run("Strictly Confidential")
-    run2.bold = True
-    run2.font.size = Pt(11)
-    p2.alignment = 1  # center
-
     doc.add_paragraph()  # spacing
 
     p3 = doc.add_paragraph()
@@ -175,7 +169,7 @@ def download_docx():
     doc.add_page_break()
 
     # ===== Claim Chart =====
-    doc.add_heading(f"Claim Chart for {publication_number}", level=1)
+    doc.add_heading(f"Claim Chart")
     table = doc.add_table(rows=1, cols=2)
     table.style = 'Table Grid'
 
