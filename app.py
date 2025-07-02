@@ -99,7 +99,7 @@ def download_docx():
     number_of_claims = str(len(claims))
     patent_link = request.form.get("patent_link", "")
 
-    company_name = "Company Name"  # You can later replace this with request.form.get("company_name")
+    company_name = "Claim Chart"  # You can later replace this with request.form.get("company_name")
 
     doc = Document()
     section = doc.sections[0]
@@ -107,22 +107,24 @@ def download_docx():
 
     # ===== Cover Page =====
     p0 = doc.add_paragraph()
+    doc.add_paragraph()
+    doc.add_paragraph()
     run0 = p0.add_run(company_name)
     run0.bold = True
     run0.font.size = Pt(28)
     p0.alignment = 1  # center
 
     p = doc.add_paragraph()
-    run = p.add_run("Evidence of Use (EoU) Analysis")
+    run = p.add_run(f"Patent Number: {publication_number}")
     run.bold = True
-    run.font.size = Pt(28)
-    p.alignment = 1  # center
+    run.font.size = Pt(16)
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT  # center
 
     p2 = doc.add_paragraph()
-    run2 = p2.add_run("Strictly Confidential")
+    run2 = p2.add_run("Target: _________________")
     run2.bold = True
     run2.font.size = Pt(16)
-    p2.alignment = 1  # center
+    p2.alignment = WD_ALIGN_PARAGRAPH.LEFT  # center
 
     doc.add_page_break()
 
@@ -162,71 +164,14 @@ def download_docx():
     doc.add_paragraph()  # spacing
 
     p3 = doc.add_paragraph()
-    run3 = p3.add_run("About the Defendant: Company Name")
+    run3 = p3.add_run("About Target Product")
     run3.bold = True
-    run3.underline = True
-    run3.font.size = Pt(14)
+    run3.font.size = Pt(11)
     doc.add_paragraph()
     doc.add_paragraph()
     doc.add_paragraph()
     p4 = doc.add_paragraph()
-    run4 = p4.add_run("Source:")
-    run4.bold = True
-
-    # ===== Add Accused Instrumentality Page =====
-    doc.add_page_break()
-    p5 = doc.add_paragraph()
-    run5 = p5.add_run("Accused Instrumentality: Product Name")
-    run5.bold = True
-    run5.underline = True
-    run5.font.size = Pt(14)
-    doc.add_paragraph()
-    doc.add_paragraph()
-    doc.add_paragraph()
-    p6 = doc.add_paragraph()
-    run6 = p6.add_run("Source:")
-    run6.font.size = Pt(11)
-    run6.bold = True
-
-    doc.add_page_break()
-
-    # Create table with 6 rows and 2 columns
-    table = doc.add_table(rows=6, cols=2)
-    table.style = 'Table Grid'
-
-    # Merge top row for title
-    heading_row = table.rows[0]
-    heading_cell = heading_row.cells[0].merge(heading_row.cells[1])
-    heading_paragraph = heading_cell.paragraphs[0]
-    heading_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    run = heading_paragraph.add_run("Company Name – Product Name")
-    run.bold = True
-
-    # Fill left column only
-    table.cell(1, 0).text = "Key claim(s)"
-    table.cell(2, 0).text = "Product/Service commercially available in patent territory"
-    table.cell(3, 0).text = "Company Value"
-    table.cell(4, 0).text = "Company Address in Patent’s Territory"
-    table.cell(5, 0).text = "Product/Service Sales data"
-
-    # Add height and vertical alignment to all rows
-    desired_height = Inches(0.4)  # or use Pt(30) for ~30 points
-
-    for row in table.rows:
-        tr = row._tr
-        trPr = tr.get_or_add_trPr()
-        trHeight = OxmlElement('w:trHeight')
-        trHeight.set(qn('w:val'), str(int(desired_height.inches * 1440)))  # Word uses 1/20 pt units
-        trHeight.set(qn('w:hRule'), 'exact')  # Use 'atLeast' if you want minimum instead of fixed
-        trPr.append(trHeight)
-        for cell in row.cells:
-            cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-
-    doc.add_paragraph()  # Add spacing after table if needed
-
-
-
-
+   
     doc.add_page_break()
 
     # ===== Claim Chart =====
@@ -258,7 +203,7 @@ def download_docx():
             claim_intro = lines[0]
 
         row_cells = table.add_row().cells
-        row_cells[0].text = f"{base_number} {claim_intro}"
+        row_cells[0].text = f"[{base_number}] {claim_intro}"  # updated
         row_cells[1].text = ""
         row = table.rows[-1]
         row.height = Inches(0.4)
@@ -272,7 +217,7 @@ def download_docx():
             else:
                 line = stripped_line
 
-            label = f"{base_number}.{sub_number} {line}"
+            label = f"[{base_number}.{sub_number}] {line}"  # updated
             row_cells = table.add_row().cells
             row_cells[0].text = label
             row_cells[1].text = ""
